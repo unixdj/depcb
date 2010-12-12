@@ -326,6 +326,33 @@ toggle_line(PcbItem *points[])
 }
 
 static void
+keep_tracing(PcbCoordinate c)
+{
+	PcbItem	*item;
+
+	init_transaction();
+	if ((item = find_point(c, ALL_LAYERS()))) {
+		c = item->p;
+	} else {
+		new_action();
+		pcb.new_action->act = PCB_ADD | PCB_POINT;
+		pcb.new_action->layers = ALL_LAYERS();
+		pcb.new_action->c = c;
+	}
+	if (pcb.coords) {
+		try_autolimit(find_point(pcb.c[0], ALL_LAYERS()));
+		new_action();
+		pcb.new_action->act = PCB_ADD | PCB_LINE;
+		pcb.new_action->layers = CUR_LAYER();
+		pcb.new_action->c = pcb.c[0];
+		pcb.new_action->l = c;
+	}
+	commit_transaction();
+	pcb.c[0] = c;
+	pcb.coords = 1;
+}
+
+static void
 try_interconnect(void)
 {
 	PcbItem	*points[2];
@@ -354,6 +381,7 @@ change_mode(int mode)
 	       	"add via",
 	       	"toggle line",
 	       	"examine",
+		"trace line",
 	};
 
 	deselect_all(0);
@@ -460,7 +488,7 @@ typedef struct {
 	char	*desc;
 } PcbKeyBinding;
 
-static void print_help(int);
+static void	print_help(int);
 
 PcbKeyBinding	key_binding[] = {
 	{ GDK_a,	toggle_autolimit,	0,
@@ -487,6 +515,8 @@ PcbKeyBinding	key_binding[] = {
 	  "r\tRedo\n" },
 	{ GDK_s,	change_mode,		PCB_SELECT,
 	  "s\tEnter select mode: click points to select\n" },
+	{ GDK_t,	change_mode,		PCB_TRACE,
+	  "t\tEnter trace mode: click points and change layers to add continuous line\n" },
 	{ GDK_u,	undo,			0,
 	  "u\tUndo\n" },
 	{ GDK_v,	change_mode,		PCB_ADD_VIA,
@@ -570,6 +600,9 @@ btn_press(GooCanvasItem *item, GooCanvasItem *target,
 			break;
 		case PCB_EXAMINE:
 			select_connected(find_closest_item(c));
+			break;
+		case PCB_TRACE:
+			keep_tracing(c);
 			break;
 		}
 		break;

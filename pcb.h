@@ -91,6 +91,7 @@ typedef struct {
 #define PCB_ADD_VIA	2
 #define PCB_ADD_LINE	3
 #define PCB_EXAMINE	4
+#define PCB_TRACE	5
 
 /* flags */
 #define PCB_DIRTY	0x1
@@ -106,6 +107,8 @@ typedef struct {
 	int		mode;
 	int		flags;
 	int		selected;
+	PcbCoordinate	c[2];
+	int		coords;
 	char		*filename;
 } Pcb;
 
