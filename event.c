@@ -332,7 +332,7 @@ keep_tracing(PcbCoordinate c)
 	PcbItem	*item;
 
 	init_transaction();
-	if ((item = find_point(c, ALL_LAYERS()))) {
+	if ((item = find_closest_point(c))) {
 		c = item->p;
 	} else {
 		new_action();
@@ -341,7 +341,10 @@ keep_tracing(PcbCoordinate c)
 		pcb.new_action->c = c;
 	}
 	if (pcb.coords) {
-		try_autolimit(find_point(pcb.c[0], ALL_LAYERS()));
+		PcbItem	*lastitem = find_point(pcb.c[0], ALL_LAYERS());
+		select_item(lastitem);
+		if (pcb.flags & PCB_AUTOLIMIT)
+			try_autolimit(lastitem);
 		new_action();
 		pcb.new_action->act = PCB_ADD | PCB_LINE;
 		pcb.new_action->layers = CUR_LAYER();
@@ -351,6 +354,7 @@ keep_tracing(PcbCoordinate c)
 	commit_transaction();
 	pcb.c[0] = c;
 	pcb.coords = 1;
+	select_item(item ? : find_point(c, ALL_LAYERS()));
 }
 
 static void
