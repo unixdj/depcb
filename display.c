@@ -35,6 +35,8 @@ show_point(PcbItem *item, int layer)
 			item->p.x, item->p.y, rad, rad,
 			"stroke-color", "black", "fill-color",
 			item->flags & PCB_SELECTED ? "green" : "white", NULL);
+#undef rad
+#undef siz
 }
 
 static void

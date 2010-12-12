@@ -129,7 +129,7 @@ change_layers_selected(int dummy)
 static void
 delete_selected(int dummy)
 {
-	if (pcb.mode -= PCB_SELECT)
+	if (pcb.mode == PCB_SELECT)
 		modify_layers_selected(0);
 }
 
@@ -212,6 +212,7 @@ add_point(PcbCoordinate c, unsigned long long layers)
 #define sq(n)		((n) * (n))
 #define sqdist(a, b)	(sq((a).x - (b).x) + sq((a).y - (b).y))
 
+/* currently only points */
 static PcbItem *
 find_closest_item(PcbCoordinate c)
 {
@@ -228,7 +229,7 @@ find_closest_item(PcbCoordinate c)
 		default:
 			continue;
 		}
-		if (curdist < 8.0 && curdist < bestdist) {
+		if (curdist < 16.0 && curdist < bestdist) {
 			best = cur;
 			bestdist = curdist;
 		}
@@ -292,8 +293,8 @@ try_autolimit(PcbItem *point)
 
 	g_print("try autolimit\n");
 	for (cur = pcb.items; cur; cur = cur->next) {
-		if (cur->l.point[0] == point ||
-		    cur->l.point[1] == point) {
+		if (cur->type == PCB_LINE &&
+		    (cur->l.point[0] == point || cur->l.point[1] == point)) {
 			if (line)
 				return;
 			g_print("found\n");
@@ -459,13 +460,13 @@ typedef struct {
 	char	*desc;
 } PcbKeyBinding;
 
-void print_help(int);
+static void print_help(int);
 
 PcbKeyBinding	key_binding[] = {
 	{ GDK_a,	toggle_autolimit,	0,
 	  "a\tToggle autolimiting of vias to layers between two wires\n" },
 	{ GDK_c,	change_layers_selected,	0,
-	  "c\tIn select mode, change layers of seected items\n" },
+	  "c\tIn select mode, change layers of selected items\n" },
 	{ GDK_d,	delete_selected,	0,
 	  "d\tIn select mode, delete selected items\n" },
 	{ GDK_e,	change_mode,		PCB_EXAMINE,
@@ -478,6 +479,10 @@ PcbKeyBinding	key_binding[] = {
 	  "l\tEnter toggle line mode: click two points to add/remove wire\n" },
 	{ GDK_p,	change_mode,		PCB_ADD_POINT,
 	  "p\tEnter add point mode: click to add a point on current layer\n" },
+	{ GDK_q,	quit,			0,
+	  "q\tQuit, unless project is modified\n" },
+	{ GDK_Q,	quit,			1,
+	  "Q\tQuit, even if project is modified\n" },
 	{ GDK_r,	redo,			0,
 	  "r\tRedo\n" },
 	{ GDK_s,	change_mode,		PCB_SELECT,
@@ -490,10 +495,6 @@ PcbKeyBinding	key_binding[] = {
 	  "w\tWrite (save) project\n" },
 	{ GDK_x,	toggle_overlays,	0,
 	  "x\tShow/hide overlays (you can't do much with overlays hidden)\n" },
-	{ GDK_q,	quit,			0,
-	  "q\tQuit, unless project is modified\n" },
-	{ GDK_Q,	quit,			1,
-	  "Q\tQuit, even if project is modified\n" },
 	{ GDK_plus,	zoom,			ZOOM_IN,
 	  "+\tZoom in\n" },
 	{ GDK_minus,	zoom,			ZOOM_OUT,
@@ -514,7 +515,8 @@ PcbKeyBinding	key_binding[] = {
 	  NULL },
 };
 
-void print_help(int dummy)
+static void
+print_help(int dummy)
 {
 	PcbKeyBinding	*cur;
 
@@ -529,13 +531,15 @@ key_press(GtkWidget *widget, GdkEventKey *event, gpointer data)
 {
 	PcbKeyBinding	*cur;
 
-	if (!(event->state & ~(GDK_SHIFT_MASK | GDK_LOCK_MASK))) {
+//	g_print("event->state %x, event->keyval %x\n",
+//	    event->state, event->keyval);
+//	if (!(event->state & ~(GDK_SHIFT_MASK | GDK_LOCK_MASK))) {
 		for (cur = key_binding; cur->keyval; cur++)
 			if (cur->keyval == event->keyval) {
 				(*cur->func)(cur->param);
 				break;
 			}
-	}
+//	}
 	return TRUE;
 }
 
