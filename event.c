@@ -188,6 +188,7 @@ deselect_all(int dummy)
 		pcb.selected = 0;
 	}
 	pcb.marked_layer = -1;
+	pcb.coords = 0;
 }
 
 static void
