@@ -29,6 +29,12 @@ show_point(PcbItem *item, int layer)
 			item->p.x - siz, item->p.y - siz, siz * 2, siz * 2,
 			"stroke-color", "black", "fill-color",
 			item->flags & PCB_SELECTED ? "red" : "yellow", NULL);
+	else if (item->flags & PCB_BEND)
+		item->canvas_item[layer] =
+		    goo_canvas_ellipse_new(pcb.layer[layer].olay,
+			item->p.x, item->p.y, 2, 2,
+			"stroke-color", "black", "fill-color",
+			item->flags & PCB_SELECTED ? "green" : "black", NULL);
 	else
 		item->canvas_item[layer] =
 		    goo_canvas_ellipse_new(pcb.layer[layer].olay,

@@ -327,7 +327,7 @@ toggle_line(PcbItem *points[])
 }
 
 static void
-keep_tracing(PcbCoordinate c)
+keep_tracing(PcbCoordinate c, int flags)
 {
 	PcbItem	*item;
 
@@ -337,7 +337,8 @@ keep_tracing(PcbCoordinate c)
 	} else {
 		new_action();
 		pcb.new_action->act = PCB_ADD | PCB_POINT;
-		pcb.new_action->layers = ALL_LAYERS();
+		pcb.new_action->flags = flags;
+		pcb.new_action->layers = flags ? CUR_LAYER() : ALL_LAYERS();
 		pcb.new_action->c = c;
 	}
 	if (pcb.coords) {
@@ -607,7 +608,32 @@ btn_press(GooCanvasItem *item, GooCanvasItem *target,
 			select_connected(find_closest_item(c));
 			break;
 		case PCB_TRACE:
-			keep_tracing(c);
+			keep_tracing(c, 0);
+			break;
+		}
+		break;
+	case 3:
+		switch (pcb.mode) {
+#if 0
+		case PCB_SELECT:
+			select_item(find_closest_item(c));
+			break;
+		case PCB_ADD_POINT:
+			add_point(c, CUR_LAYER());
+			break;
+		case PCB_ADD_VIA:
+			add_point(c, ALL_LAYERS());
+			break;
+		case PCB_ADD_LINE:
+			select_item(find_closest_point(c));
+			try_interconnect();
+			break;
+		case PCB_EXAMINE:
+			select_connected(find_closest_item(c));
+			break;
+#endif
+		case PCB_TRACE:
+			keep_tracing(c, PCB_BEND);
 			break;
 		}
 		break;

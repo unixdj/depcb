@@ -19,6 +19,7 @@ typedef struct {
 
 /* flags - saved */
 #define PCB_POI			0x0001
+#define PCB_BEND		0x0002
 #define PCB_SAVED_FLAGS		0x000f
 /* flags - stored in undo list */
 #define PCB_SELECTED		0x0010
