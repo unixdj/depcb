@@ -215,7 +215,7 @@ add_point(PcbCoordinate c, unsigned long long layers)
 
 /* currently only points */
 static PcbItem *
-find_closest_item(PcbCoordinate c)
+find_closest_item(PcbCoordinate c, long long layer)
 {
 	PcbItem	*best = NULL;
 	PcbItem	*cur;
@@ -223,6 +223,8 @@ find_closest_item(PcbCoordinate c)
 	gdouble curdist;
 
 	for (cur = pcb.items; cur; cur = cur->next) {
+		if (!(cur->layers & layer))
+			continue;
 		switch (cur->type) {
 		case PCB_POINT:
 			curdist = sqdist(cur->p, c);
@@ -329,16 +331,17 @@ toggle_line(PcbItem *points[])
 static void
 keep_tracing(PcbCoordinate c, int flags)
 {
-	PcbItem	*item;
+	long long	layers = flags ? CUR_LAYER() : ALL_LAYERS();
+	PcbItem		*item;
 
 	init_transaction();
-	if ((item = find_closest_point(c))) {
+	if ((item = find_closest_point(c, layers))) {
 		c = item->p;
 	} else {
 		new_action();
 		pcb.new_action->act = PCB_ADD | PCB_POINT;
 		pcb.new_action->flags = flags;
-		pcb.new_action->layers = flags ? CUR_LAYER() : ALL_LAYERS();
+		pcb.new_action->layers = layers;
 		pcb.new_action->c = c;
 	}
 	if (pcb.coords) {
@@ -592,7 +595,7 @@ btn_press(GooCanvasItem *item, GooCanvasItem *target,
 	case 1:
 		switch (pcb.mode) {
 		case PCB_SELECT:
-			select_item(find_closest_item(c));
+			select_item(find_closest_item(c, CUR_LAYER()));
 			break;
 		case PCB_ADD_POINT:
 			add_point(c, CUR_LAYER());
@@ -601,11 +604,11 @@ btn_press(GooCanvasItem *item, GooCanvasItem *target,
 			add_point(c, ALL_LAYERS());
 			break;
 		case PCB_ADD_LINE:
-			select_item(find_closest_point(c));
+			select_item(find_closest_point(c, CUR_LAYER()));
 			try_interconnect();
 			break;
 		case PCB_EXAMINE:
-			select_connected(find_closest_item(c));
+			select_connected(find_closest_item(c, CUR_LAYER()));
 			break;
 		case PCB_TRACE:
 			keep_tracing(c, 0);
@@ -616,7 +619,7 @@ btn_press(GooCanvasItem *item, GooCanvasItem *target,
 		switch (pcb.mode) {
 #if 0
 		case PCB_SELECT:
-			select_item(find_closest_item(c));
+			select_item(find_closest_item(c, CUR_LAYER()));
 			break;
 		case PCB_ADD_POINT:
 			add_point(c, CUR_LAYER());
@@ -625,11 +628,11 @@ btn_press(GooCanvasItem *item, GooCanvasItem *target,
 			add_point(c, ALL_LAYERS());
 			break;
 		case PCB_ADD_LINE:
-			select_item(find_closest_point(c));
+			select_item(find_closest_point(c, CUR_LAYER()));
 			try_interconnect();
 			break;
 		case PCB_EXAMINE:
-			select_connected(find_closest_item(c));
+			select_connected(find_closest_item(c, CUR_LAYER()));
 			break;
 #endif
 		case PCB_TRACE:
