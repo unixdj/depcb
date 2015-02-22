@@ -14,7 +14,7 @@ all: $(PROG)
 $(OBJS): $(HDRS)
 
 $(PROG): $(OBJS)
-	$(CC) $(LDFLAGS) -o $(PROG) $(OBJS)
+	$(CC) $(OBJS) $(LDFLAGS) -o $(PROG)
 
 clean:
 	-rm -rf $(PROG) $(OBJS)
