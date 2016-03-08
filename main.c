@@ -342,7 +342,7 @@ load_project(char *filename)
 					PARSE_ERROR();
 				break;
 			}
-		       	if (tokens == 6 && !strcmp(tok[0], "line")) {
+			if (tokens == 6 && !strcmp(tok[0], "line")) {
 				pcb.action->act = PCB_ADD | PCB_LINE;
 				GET_LAYER(pcb.action->layers, tok[1]);
 				GET_COORD(pcb.action->c, tok[2], tok[3]);

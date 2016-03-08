@@ -385,11 +385,11 @@ static void
 change_mode(int mode)
 {
 	static char	*desc[] = {
-	       	"select",
-	       	"add point",
-	       	"add via",
-	       	"toggle line",
-	       	"examine",
+		"select",
+		"add point",
+		"add via",
+		"toggle line",
+		"examine",
 		"trace line",
 	};
 
