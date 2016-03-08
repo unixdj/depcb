@@ -197,6 +197,7 @@ save_project(int dummy)
 	PcbItem	*item;
 	int	i;
 
+	(void)dummy;
 	if (!(f = fopen(pcb.filename, "w"))) {
 		g_warning("Can't open file: %s: %s\n", pcb.filename,
 		    strerror(errno));

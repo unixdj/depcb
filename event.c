@@ -5,6 +5,7 @@
 static void
 undo(int dummy)
 {
+	(void)dummy;
 	while (pcb.action->prev) {
 		play_action(PCB_UNDO);
 		pcb.action = pcb.action->prev;
@@ -17,6 +18,7 @@ undo(int dummy)
 static void
 redo(int dummy)
 {
+	(void)dummy;
 	if (pcb.action->next) do {
 		pcb.action = pcb.action->next;
 		play_action(PCB_DO);
@@ -114,6 +116,7 @@ change_layers_selected(int dummy)
 {
 	unsigned long long	layers;
 
+	(void)dummy;
 	if (pcb.mode != PCB_SELECT)
 		return;
 	if (pcb.marked_layer == -1) {
@@ -129,6 +132,7 @@ change_layers_selected(int dummy)
 static void
 delete_selected(int dummy)
 {
+	(void)dummy;
 	if (pcb.mode == PCB_SELECT)
 		modify_layers_selected(0);
 }
@@ -138,6 +142,7 @@ toggle_poi_selected(int dummy)
 {
 	PcbItem	*cur;
 
+	(void)dummy;
 	init_transaction();
 	if (pcb.mode != PCB_SELECT)
 		return;
@@ -180,6 +185,7 @@ deselect_all(int dummy)
 {
 	PcbItem	*cur;
 
+	(void)dummy;
 	if (pcb.selected) {
 		for (cur = pcb.items; cur; cur = cur->next) {
 			if (cur->flags & PCB_SELECTED)
@@ -467,6 +473,7 @@ zoom(int dir)
 static void
 toggle_overlays(int dummy)
 {
+	(void)dummy;
 	if (pcb.layer[pcb.curlayer].olay)
 		hide_overlays(pcb.curlayer);
 	else
@@ -476,6 +483,7 @@ toggle_overlays(int dummy)
 static void
 toggle_autolimit(int dummy)
 {
+	(void)dummy;
 	pcb.flags ^= PCB_AUTOLIMIT;
 	g_print("autolimit %s\n", pcb.flags & PCB_AUTOLIMIT ? "on" : "off");
 }
@@ -491,10 +499,10 @@ quit(int force)
 }
 
 typedef struct {
-	int	keyval;
-	void	(*func)(int);
-	int	param;
-	char	*desc;
+	unsigned int	keyval;
+	void		(*func)(int);
+	int		param;
+	char		*desc;
 } PcbKeyBinding;
 
 static void	print_help(int);
@@ -559,6 +567,7 @@ print_help(int dummy)
 {
 	PcbKeyBinding	*cur;
 
+	(void)dummy;
 	g_print("\n\nKeyboard:\n");
 	for (cur = key_binding; cur->desc; cur++)
 		g_print("%s", cur->desc);
@@ -570,6 +579,8 @@ key_press(GtkWidget *widget, GdkEventKey *event, gpointer data)
 {
 	PcbKeyBinding	*cur;
 
+	(void)widget;
+	(void)data;
 //	g_print("event->state %x, event->keyval %x\n",
 //	    event->state, event->keyval);
 //	if (!(event->state & ~(GDK_SHIFT_MASK | GDK_LOCK_MASK))) {
@@ -588,6 +599,9 @@ btn_press(GooCanvasItem *item, GooCanvasItem *target,
 {
 	PcbCoordinate	c = { event->x, event->y };
 
+	(void)item;
+	(void)target;
+	(void)data;
 	g_print("button %d @ %f %f\n", event->button, event->x, event->y);
 	if (!pcb.layer[pcb.curlayer].olay)
 		return TRUE;
@@ -647,6 +661,10 @@ btn_press(GooCanvasItem *item, GooCanvasItem *target,
 static gboolean
 delete_event(GtkWidget *widget, GdkEvent *event, gpointer data)
 {
+	(void)widget;
+	(void)event;
+	(void)data;
+
 	/* If you return FALSE in the "delete-event" signal handler,
 	 * GTK will emit the "destroy" signal. Returning TRUE means
 	 * you don't want the window to be destroyed.
@@ -664,6 +682,8 @@ delete_event(GtkWidget *widget, GdkEvent *event, gpointer data)
 static void
 destroy(GtkWidget *widget, gpointer data)
 {
+	(void)widget;
+	(void)data;
 	g_print("destroy\n");
 	gtk_main_quit();
 }

@@ -2,7 +2,7 @@ DEBUG		= -g
 #DEBUG		= -O2
 GTK_CFLAGS	:= $(shell pkg-config --cflags gtk+-2.0 goocanvas)
 GTK_LDFLAGS	:= $(shell pkg-config --libs gtk+-2.0 goocanvas)
-CFLAGS		+= $(DEBUG) -Wall -Werror $(GTK_CFLAGS)
+CFLAGS		+= $(DEBUG) -Wall -Wextra -Werror $(GTK_CFLAGS)
 LDFLAGS		+= $(DEBUG) $(GTK_LDFLAGS)
 SRCS		= main.c event.c display.c
 OBJS		= $(SRCS:.c=.o)
