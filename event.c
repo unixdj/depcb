@@ -381,7 +381,7 @@ try_interconnect(void)
 	select_item(points[1]);
 }
 
-inline void
+static void
 change_mode(int mode)
 {
 	static char	*desc[] = {
